@@ -1,0 +1,103 @@
+source 'https://rubygems.org'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
+
+ruby '2.5.0'
+
+# Stack
+gem 'rails', '~> 5.2.0.rc1'
+gem 'pg'
+gem 'mysql2', '~>0.4.4'
+gem 'puma', '~> 3.11'
+gem 'foreman'
+gem 'rack-cors'
+gem 'rack-canonical-host'
+
+# Auth
+gem 'bcrypt', '~> 3.1.7'
+gem 'pundit'
+gem 'jwt'
+
+# ActiveRecord
+gem 'closure_tree'
+gem 'activerecord-import'
+gem 'amoeba'
+
+# Logging
+gem 'ruby-kafka'
+gem 'rails_semantic_logger'
+
+# Error Logging
+gem 'sentry-raven'
+
+# Performance
+gem 'scout_apm'
+
+# Services
+gem 'interactor-rails', '~> 2.0'
+
+# GraphQL
+gem 'graphql', '~> 1.8.0.pre6'
+gem 'graphql-sugar', github: 'keepworks/graphql-sugar', branch: 'support-1.8-datetime'
+gem 'graphql-guard'
+gem 'apollo_upload_server', '2.0.0.beta.1'
+
+# Uploads
+gem 'shrine', '~> 3.2', '>= 3.2.1'
+gem 'image_processing'
+gem 'aws-sdk-s3', '~> 1'
+
+# Background Jobs
+gem 'bunny'
+gem 'sneakers'
+
+# Misc
+gem 'geocoder'
+gem 'mail'
+gem 'device_detector'
+
+# Reduces boot times through caching; required in config/boot.rb
+gem 'bootsnap', '>= 1.1.0', require: false
+
+group :development do
+  gem 'bullet'
+  gem 'graphiql-rails'
+  gem 'graphql-rails_logger'
+  gem 'listen', '>= 3.0.5', '< 3.2'
+  gem 'spring'
+  gem 'spring-watcher-listen', '~> 2.0.0'
+end
+
+group :test do
+  gem 'simplecov', require: false
+  gem 'shoulda-matchers', github: 'thoughtbot/shoulda-matchers'
+  gem 'pundit-matchers', '~> 1.6.0'
+  gem 'timecop'
+  gem 'webmock'
+  gem 'climate_control'
+end
+
+group :development, :test do
+  gem 'awesome_print'
+  gem 'rspec-rails'
+  gem 'factory_bot_rails'
+
+  gem 'rubocop', '~> 0.81.0', require: false
+  gem 'rubocop-rails'
+
+  gem 'guard'
+  gem 'guard-brakeman', require: false
+  gem 'guard-bundler', require: false
+  gem 'guard-foreman'
+  gem 'guard-rspec'
+  gem 'guard-rubocop'
+  gem 'terminal-notifier-guard', require: false # Shows test alerts in OS X 10.8 Notification Center
+
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+end
+
+group :development, :test, :staging do
+  gem 'ffaker'
+end
+
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]

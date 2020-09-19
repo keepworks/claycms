@@ -1,0 +1,11 @@
+.sortable-ghost {
+  opacity: 0.5;
+}
+
+.drag-handle {
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}

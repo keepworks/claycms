@@ -1,0 +1,21 @@
+{
+  "plugins": [
+    "react-hot-loader/babel",
+
+    // autobinding functions in ES6 classes
+    "babel-plugin-transform-class-properties",
+
+    // support rest/spread properties for objects
+    "transform-object-rest-spread",
+
+    // optimize lodash size by cherry-picking only used modules
+    "lodash",
+
+    // allow dynamic importing of large external libraries
+    "syntax-dynamic-import"
+  ],
+  "presets": [
+    ["es2015", { "modules": false }],
+    "react"
+  ]
+}

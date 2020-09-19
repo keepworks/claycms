@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+docker-compose exec pgdb psql -U postgres -c 'CREATE DATABASE clay_cms_development'
+docker-compose exec pgdb psql -U postgres -c 'CREATE DATABASE clay_cms_test'
+docker-compose exec pgdb psql -U postgres -c 'CREATE DATABASE clay_cms_staging'
+docker-compose exec pgdb psql -U postgres -c 'CREATE DATABASE clay_cms_production'
+
+docker-compose exec pgdb psql -U postgres -c "CREATE USER claycool with ENCRYPTED PASSWORD 'ABC12abc'"
+docker-compose exec pgdb psql -U postgres -c 'GRANT ALL PRIVILEGES ON DATABASE clay_cms_development to claycool'
+docker-compose exec pgdb psql -U postgres -c 'GRANT ALL PRIVILEGES ON DATABASE clay_cms_test to claycool'
+docker-compose exec pgdb psql -U postgres -c 'GRANT ALL PRIVILEGES ON DATABASE clay_cms_staging to claycool'
+docker-compose exec pgdb psql -U postgres -c 'GRANT ALL PRIVILEGES ON DATABASE clay_cms_production to claycool'

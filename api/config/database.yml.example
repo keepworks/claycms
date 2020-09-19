@@ -1,0 +1,23 @@
+base: &base
+  adapter: postgresql
+  encoding: utf8
+  username:
+  password:
+  host: localhost
+  pool: <%= ENV.fetch('RAILS_MAX_THREADS') { 5 } %>
+
+development:
+  <<: *base
+  database: clay_cms_development
+
+test:
+  <<: *base
+  database: clay_cms_test
+
+staging:
+  <<: *base
+  database: clay_cms_staging
+
+production:
+  <<: *base
+  database: clay_cms_production

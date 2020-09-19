@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+echo "removing old pid's .."
+rm -f tmp/pids/server.pid
+
+echo "checking bundle dependencies .."
+bundle check || bundle install
+
+echo "boooting up .."
+bundle exec rails s -p 3000 -b 0.0.0.0 -e development

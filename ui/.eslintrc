@@ -1,0 +1,36 @@
+{
+  "extends": "airbnb",
+  "env": {
+    "browser": true
+  },
+  "parser": "babel-eslint",
+  "plugins": ["react-hooks"],
+  "rules": {
+    "array-bracket-spacing": ["error", "always"],
+    "comma-dangle": ["error", "never"],
+    "jsx-a11y/anchor-is-valid": ["error", {
+      "components": ["FooterLink", "Link", "MenuLink", "NavLink", "PageLink", "TextLink"],
+      "specialLink": ["to"],
+      "aspects": ["noHref", "invalidHref", "preferButton"]
+    }],
+    "jsx-a11y/label-has-for": ["off"],
+    "no-class-assign": ["off"],
+    "no-func-assign": ["off"],
+    "no-multiple-empty-lines": ["error", { "max": 1, "maxBOF": 0, "maxEOF": 0 }],
+    "no-param-reassign": ["error", { "props": false }],
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
+    "no-unused-vars": ["error", { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" }],
+    "object-curly-newline": ["error", { "consistent": true }],
+    "react/button-has-type":["off"],
+    "react/forbid-prop-types": ["off"],
+    "react/jsx-filename-extension": ["error", { "extensions": [".js", ".jsx"] }],
+    "react/no-unused-prop-types": ["off"],
+    "react/prop-types": ["off"],
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn",
+    "semi": ["error", "never"]
+  },
+  "settings": {
+    "import/resolver": "webpack"
+  }
+}

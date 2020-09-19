@@ -1,0 +1,11 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:200,300,500,400,600,700');
+@import url('https://fonts.googleapis.com/css?family=Roboto:700,900');
+@import '~node_modules/@uppy/core/dist/style.css';
+@import '~node_modules/@uppy/dashboard/dist/style.css';
+@import '~node_modules/normalize.css/normalize.css';
+
+@import 'react_sortablejs.css';
+
+@import 'fonts.css';
+@import 'icons.css';
+@import 'globals.css';

@@ -1,0 +1,42 @@
+guard :bundler do
+  require 'guard/bundler'
+  require 'guard/bundler/verify'
+  helper = Guard::Bundler::Verify.new
+
+  files = ['Gemfile']
+  files += Dir['*.gemspec'] if files.any? { |f| helper.uses_gemspec?(f) }
+
+  # Assume files are symlinked from somewhere
+  files.each { |file| watch(helper.real_path(file)) }
+end
+
+guard :foreman, concurrency: 'web=1,worker=1,release=0' do
+  watch(%r{^lib\/.+\.rb$})
+  watch(%r{^config\/*})
+end
+
+guard :rubocop, cli: ['--display-cop-names'] do
+  watch(/.+\.rb$/)
+  watch(%r{(?:.+/)?\.rubocop\.yml$}) { |m| File.dirname(m[0]) }
+end
+
+guard :brakeman, quiet: true do
+  watch(%r{^app/.+\.(slim|erb|haml|rhtml|rb)$})
+  watch(%r{^config/.+\.rb$})
+  watch(%r{^lib/.+\.rb$})
+  watch('Gemfile')
+end
+
+guard :rspec, cmd: 'bundle exec rspec', all_on_start: true do
+  watch('spec/spec_helper.rb')                        { 'spec' }
+  watch('config/routes.rb')                           { 'spec/routing' }
+  watch('app/controllers/application_controller.rb')  { 'spec/controllers' }
+  watch(%r{^spec/.+_spec\.rb$})
+  watch(%r{^app/(.+)\.rb$})                           { |m| "spec/#{m[1]}_spec.rb" }
+  watch(%r{^app/(.*)(\.erb|\.haml|\.slim)$})          { |m| "spec/#{m[1]}#{m[2]}_spec.rb" }
+  watch(%r{^lib/(.+)\.rb$})                           { |m| "spec/lib/#{m[1]}_spec.rb" }
+  watch(%r{^app/controllers/(.+)_(controller)\.rb$})  { |m| ["spec/routing/#{m[1]}_routing_spec.rb", "spec/#{m[2]}s/#{m[1]}_#{m[2]}_spec.rb", "spec/acceptance/#{m[1]}_spec.rb"] }
+
+  # Watch factories
+  watch(%r{^spec/factories/(.*)s\.rb$}) { |m| "spec/models/#{m[1]}_spec.rb" }
+end

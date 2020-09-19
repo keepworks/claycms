@@ -1,0 +1,97 @@
+require: rubocop-rails
+
+AllCops:
+  Exclude:
+    - 'db/schema.rb'
+    - 'bin/*'
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+
+Layout/LineLength:
+  Enabled: false
+
+Lint/NonDeterministicRequireOrder:
+  Enabled: false
+
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
+Metrics/MethodLength:
+  Enabled: false
+
+Rails:
+  Enabled: true
+
+Rails/Delegate:
+  Enabled: false
+
+Rails/FilePath:
+  EnforcedStyle: arguments
+
+Rails/HasAndBelongsToMany:
+  Enabled: false
+
+Rails/ReversibleMigration:
+  Enabled: false
+
+Rails/SkipsModelValidations:
+  Enabled: false
+
+Rails/UniqueValidationWithoutIndex:
+  Enabled: false
+
+Rails/UnknownEnv:
+  Environments:
+    - development
+    - test
+    - staging
+    - production
+
+Style/Documentation:
+  Enabled: false
+
+Style/FrozenStringLiteralComment: # This cop is designed to help upgrade to Ruby 3.0
+  Enabled: false
+
+Style/Lambda:
+  EnforcedStyle: literal
+
+Style/NegatedIf:
+  Enabled: false
+
+Style/NumericPredicate:
+  EnforcedStyle: comparison
+
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true

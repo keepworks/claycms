@@ -1,0 +1,13 @@
+{
+  "root": "dist/",
+  "canonical_host": "${HOST}",
+  "canonical_subdomains": true,
+  "https_only": true,
+  "routes": {
+    "/javascripts/*": "/javascripts/",
+    "/stylesheets/*": "/stylesheets/",
+    "/images/*": "/images/",
+    "/fonts/*": "/fonts/",
+    "/**": "index.html"
+  }
+}

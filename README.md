@@ -1,2 +1,3 @@
-# claycms
-Clay CMS Monorepo
+# Clay CMS
+
+Clay CMS Monorepo.
