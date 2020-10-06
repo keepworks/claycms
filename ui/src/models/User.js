@@ -1,10 +1,10 @@
-import { object, string } from 'yup'
+import { object, ref, string } from 'yup'
 
 import BaseModel from './BaseModel'
 
 class User extends BaseModel {
-  static validateSignup(values) {
-    return this.validate(values, [ 'email' ])
+  static validateChangePassword(values) {
+    return this.validate(values, [ 'currentPassword', 'password', 'passwordConfirmation' ])
   }
 
   static validateProfile(values) {
@@ -24,8 +24,11 @@ class User extends BaseModel {
 
 User.schema = object({
   email: string().email().required(),
+  password: string().required().min(8).max(72),
+  passwordConfirmation: string().equalTo(ref('password')).required(),
   firstName: string().required(),
-  lastName: string().required()
+  lastName: string().required(),
+  currentPassword: string().required()
 })
 
 User.sessionStates = Object.freeze({

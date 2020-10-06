@@ -11,15 +11,10 @@ import { NavLink } from 'components/external/typography'
 function Header({ classes }) {
   const isHome = matchPath(document.location.pathname, { path: '/', exact: true })
 
-  const navLinks = (
-    <Fragment>
-      <NavLink to="/login">
+  const navLink = (
+    <NavLink isButton to="/sso/login">
         Log in
-      </NavLink>
-      <NavLink isButton to="/signup">
-        Sign up
-      </NavLink>
-    </Fragment>
+    </NavLink>
   )
 
   const homeLink = (
@@ -38,7 +33,7 @@ function Header({ classes }) {
       <GridItem>
         <header className={classes.header}>
           {!isHome && homeLink}
-          {navLinks}
+          {navLink}
         </header>
       </GridItem>
     </GridContainer>

@@ -1,4 +1,5 @@
 import classNames from 'classnames'
+import injectSheet from 'react-jss/lib/injectSheet'
 import PropTypes from 'prop-types'
 import React from 'react'
 import { Link } from 'react-router-dom'
@@ -20,7 +21,7 @@ function TextLink({
   }
 
   return (
-    <LinkTag className={classNames(className)} {...linkProps} {...cleanProps(other)}>
+    <LinkTag className={classNames(className, classes.link)} {...linkProps} {...cleanProps(other)}>
       {children}
     </LinkTag>
   )
@@ -37,4 +38,8 @@ TextLink.defaultProps = {
   to: null
 }
 
-export default TextLink
+export default injectSheet(() => ({
+  link: {
+    cursor: 'pointer'
+  }
+}))(TextLink)

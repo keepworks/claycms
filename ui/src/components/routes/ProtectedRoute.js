@@ -35,7 +35,7 @@ function ProtectedRoute({
 
               setReferrer({ url: (pathname || '') + (search || '') + (hash || '') })
 
-              return <Redirect to="/login" />
+              return <Redirect to="/" />
             }
 
             return (

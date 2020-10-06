@@ -6,11 +6,11 @@ import MenuBody from 'components/internal/menu/MenuBody'
 import MenuFooter from 'components/internal/menu/MenuFooter'
 import MenuItem from 'components/internal/menu/MenuItem'
 import MenuLink from 'components/internal/menu/MenuLink'
-import { logout } from 'client/methods'
+import { resetStore } from 'client/methods'
 import { withMutation } from 'lib/data'
 
-function UserMenu({ closeMenu, destroySession }) {
-  const handleLogout = () => destroySession().then(() => logout())
+function UserMenu({ closeMenu, ssoLogout }) {
+  const handleLogout = () => ssoLogout().then(resetStore)
 
   return (
     <Menu closeMenu={closeMenu}>
@@ -35,9 +35,9 @@ function UserMenu({ closeMenu, destroySession }) {
 }
 
 UserMenu = withMutation(gql`
-  mutation LogoutMutation {
-    destroySession {
-      id
+  mutation SSOLogoutMutation {
+    ssoLogout {
+      success
     }
   }
 `)(UserMenu)

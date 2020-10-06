@@ -9,7 +9,7 @@ const authLink = new ApolloLink((operation, forward) => {
   const headers = {}
 
   if (token) {
-    headers['X-Token'] = token
+    headers.Authorization = `Bearer ${token}`
   }
 
   operation.setContext({ headers })
