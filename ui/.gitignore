@@ -81,5 +81,3 @@ $RECYCLE.BIN/
 # Bundle Files
 dist/*
 
-# VSCode settings
-.vscode/*
