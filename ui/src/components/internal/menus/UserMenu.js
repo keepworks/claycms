@@ -21,9 +21,9 @@ function UserMenu({ closeMenu, ssoLogout }) {
         {/* <MenuLink to="/user/notifications" onClick={closeMenu}>
           Notifications
         </MenuLink> */}
-        <MenuLink to="/user/settings" onClick={closeMenu}>
+        {/* <MenuLink to="/user/settings" onClick={closeMenu}>
           Settings
-        </MenuLink>
+        </MenuLink> */}
       </MenuBody>
       <MenuFooter>
         <MenuItem onClick={handleLogout}>
