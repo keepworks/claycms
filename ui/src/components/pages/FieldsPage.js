@@ -90,10 +90,13 @@ function FieldsPage({
     }
   ]
 
-  const processedFields = _.sortBy(processFields(rootFields), [ 'position' ])
   if (loading) {
     return <Loader record={{ loading: true }} />
   }
+
+  const processedFields = _.sortBy(processFields(rootFields), [ 'position' ])
+  const nextPosition = processedFields.length > 0 ? _.last(processedFields).position + 1 : 0
+  const formValues = { entityId: match.params.entityId, dataType: 'single_line_text', position: nextPosition, ...field }
 
   return (
     <Fragment>
@@ -123,7 +126,7 @@ function FieldsPage({
 
       <FieldSidePane
         isOpen={isFieldSidePaneOpen}
-        formValues={{ entityId: match.params.entityId, dataType: 'single_line_text', position: processedFields.length, ...field }}
+        formValues={formValues}
         entities={entities}
         onFormSubmit={handleFormSubmit}
         onRequestClose={closeFieldSidePane}
