@@ -53,9 +53,18 @@ ActiveRecord::Schema.define(version: 2020_09_09_072630) do
     t.datetime "updated_at", null: false
     t.bigint "parent_id"
     t.string "uid"
+    t.integer "position", default: 0
     t.index ["name"], name: "index_entities_on_name"
     t.index ["parent_id"], name: "index_entities_on_parent_id"
     t.index ["project_id"], name: "index_entities_on_project_id"
+  end
+
+  create_table "entity_hierarchies", id: false, force: :cascade do |t|
+    t.integer "ancestor_id", null: false
+    t.integer "descendant_id", null: false
+    t.integer "generations", null: false
+    t.index ["ancestor_id", "descendant_id", "generations"], name: "entity_anc_desc_idx", unique: true
+    t.index ["descendant_id"], name: "entity_desc_idx"
   end
 
   create_table "exports", force: :cascade do |t|

@@ -5,6 +5,7 @@ module Types
     attribute :label
     attribute :name
     attribute :singleton
+    attribute :position
 
     relationship :fields
     relationship :parent

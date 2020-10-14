@@ -6,6 +6,7 @@ class UpdateEntityMutator < ApplicationMutator
     parameter :name, !types.String
     parameter :label, !types.String
     parameter :singleton, types.Boolean
+    parameter :position, types.Int
   end
 
   parameter :id, !types.ID

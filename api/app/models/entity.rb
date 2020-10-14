@@ -5,6 +5,8 @@ class Entity < ApplicationRecord
   belongs_to :parent, class_name: 'Entity', optional: true
   belongs_to :project
 
+  has_closure_tree order: 'position', numeric_order: true, dependent: :destroy
+
   has_many :fields, dependent: :destroy
   has_many :relationships, dependent: :destroy
   has_many :records, dependent: :destroy

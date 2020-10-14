@@ -30,6 +30,7 @@ module Roots
     mutator :createEntity
     mutator :updateEntity
     mutator :destroyEntity
+    mutator :sortEntities
 
     mutator :createField
     mutator :updateField

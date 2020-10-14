@@ -7,6 +7,7 @@ class CreateEntityMutator < ApplicationMutator
     parameter :name, !types.String
     parameter :label, !types.String
     parameter :singleton, types.Boolean
+    parameter :position, types.Int
   end
 
   parameter :input, !CreateEntityInputType
