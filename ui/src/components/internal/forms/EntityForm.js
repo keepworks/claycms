@@ -28,7 +28,10 @@ function EntityForm({ entities, initialValues, ...other }) {
     ? Entity.validateUpdate
     : Entity.validateCreate
 
-  const entityOptions = entities.map(entity => ({ label: entity.label, value: entity.id }))
+  const entityOptions = entities
+    .filter(entity => entity.id !== initialValues.id)
+    .map(entity => ({ label: entity.label, value: entity.id }))
+
   entityOptions.unshift({ label: 'None', value: null })
 
   return (
