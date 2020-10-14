@@ -45,7 +45,9 @@ const isPrimitiveDataType = type => !(type === 'array' || type === 'key_value' |
 
 function FieldForm({ classes, entities, initialValues, ...other }) {
   const decorators = initialValues.id ? [] : [ decorator ]
-  const entityOptions = entities.map(entity => ({ label: entity.label, value: entity.id }))
+  const entityOptions = entities
+    .filter(entity => entity.id !== initialValues.entityId)
+    .map(entity => ({ label: entity.label, value: entity.id }))
 
   const hiddenField = initialValues.id
     ? <Field name="id" component="input" type="hidden" />
