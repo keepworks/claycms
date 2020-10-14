@@ -33,6 +33,44 @@ const REFERENCE_OPTIONS = [
   { value: 'edit', label: 'Existing Record' }
 ]
 
+const JSONField = ({ name, label }) => (
+  <FieldArray name={name} key={name}>
+    {({ fields }) => (
+      <Fragment>
+        <Text variant="regularSquished" color="pale">{label}</Text>
+        <Spacer height={10} />
+        <FieldGroup>
+          {fields.map((field, index) => (
+            <ItemBar justifyContent="space-between" gutter="large" key={field}>
+              <Field
+                name={`${field}.key`}
+                component={TextInput}
+                flexGrow={1}
+                parse={v => v}
+                placeholder="key"
+                spaced={false}
+                stretched={false}
+              />
+              <Field
+                name={`${field}.value`}
+                component={TextInput}
+                flexGrow={1}
+                parse={v => v}
+                placeholder="value"
+                spaced={false}
+                stretched={false}
+              />
+              <CloseButton onClick={() => fields.remove(index)} />
+            </ItemBar>
+          ))
+          }
+          <FilledButton label="Add data" onClick={() => fields.push()} size="tiny" type="button" />
+        </FieldGroup>
+      </Fragment>
+    )}
+  </FieldArray>
+)
+
 const KeyValueField = ({ childFields, fieldLabel, initialValues, name, parentField, values, ...props }) => {
   const isParentArray = parentField && parentField.dataType === 'array'
 
@@ -239,7 +277,16 @@ const fieldRenderer = (props) => {
                     </FieldGroup>
                   ))}
                 </ReactSortable>
-                <FilledButton type="button" size="tiny" label="Add" onClick={() => fieldsArray.push({ position: list.length })} />
+                <FilledButton
+                  type="button"
+                  size="tiny"
+                  label="Add"
+                  onClick={() => fieldsArray.push({
+                    position: list.length,
+                    // needed so 1st field is visible automatically in JSONInput
+                    value: field.elementType === 'json' ? [ undefined ] : undefined
+                  })}
+                />
                 <Spacer height={20} />
               </Fragment>
             )
@@ -247,6 +294,10 @@ const fieldRenderer = (props) => {
         </FieldArray>
       </Fragment>
     )
+  }
+
+  if (field.dataType === 'json') {
+    return <JSONField label={fieldLabel} name={name} />
   }
 
   if (field.dataType === 'reference') {

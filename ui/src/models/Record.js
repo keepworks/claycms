@@ -1,4 +1,5 @@
 import _ from 'lodash'
+import flat from 'flat'
 import { object, mixed } from 'yup'
 
 import BaseModel from './BaseModel'
@@ -89,6 +90,16 @@ class Record extends BaseModel {
     if (dataType === 'reference') {
       return {
         id: property.linkedRecordId
+      }
+    }
+
+    if (dataType === 'json') {
+      try {
+        return Object.entries(
+          flat.flatten(JSON.parse(property.value))
+        ).map(([ key, value ]) => ({ key, value }))
+      } catch (error) {
+        return []
       }
     }
 

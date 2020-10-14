@@ -6,7 +6,7 @@ class Field < ApplicationRecord
 
   has_closure_tree order: 'position', numeric_order: true, dependent: :destroy
 
-  enum data_type: { single_line_text: 0, multiple_line_text: 1, number: 2, decimal: 3, boolean: 4, image: 5, key_value: 6, reference: 7, array: 8, color: 9, file: 10 }
+  enum data_type: { single_line_text: 0, multiple_line_text: 1, number: 2, decimal: 3, boolean: 4, image: 5, key_value: 6, reference: 7, array: 8, color: 9, file: 10, json: 11 }
   enum element_type: Field.data_types.except(:array), _prefix: :element
 
   belongs_to :entity, optional: true

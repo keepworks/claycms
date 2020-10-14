@@ -40,6 +40,8 @@ class CreateRecord
       end
     elsif field.image? || field.file?
       property = { field: field, asset: process_asset(value) }
+    elsif field.json?
+      property = { field: field, value: value.to_json }
     else
       property = { field: field, value: value }
     end

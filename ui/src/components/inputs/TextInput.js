@@ -87,6 +87,7 @@ TextInput.propTypes = {
   autoComplete: PropTypes.oneOf([ 'off', 'on' ]),
   badge: PropTypes.oneOfType([ PropTypes.number, PropTypes.bool ]),
   disabled: PropTypes.bool,
+  flexGrow: PropTypes.oneOfType([ PropTypes.number, PropTypes.string ]),
   hint: PropTypes.string,
   icon: PropTypes.string,
   isMultiline: PropTypes.bool,
@@ -103,6 +104,7 @@ TextInput.defaultProps = {
   autoComplete: 'off',
   badge: null,
   disabled: false,
+  flexGrow: 'initial',
   hint: null,
   icon: null,
   isMultiline: false,
@@ -121,9 +123,10 @@ TextInput.fieldError = ({
 export default injectSheet(({
   colors, typography, units
 }) => ({
-  textInput: ({ variant, spaced }) => {
+  textInput: ({ variant, spaced, flexGrow }) => {
     const commonStyles = {
-      position: 'relative' // For FieldError and FieldHint
+      position: 'relative', // For FieldError and FieldHint
+      flexGrow: flexGrow || 'initial'
     }
 
     if (variant === 'expandable') {

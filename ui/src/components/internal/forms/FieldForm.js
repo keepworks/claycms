@@ -41,7 +41,7 @@ const decorator = createDecorator(
   }
 )
 
-const isPrimitiveDataType = type => !(type === 'array' || type === 'key_value' || type === 'reference')
+const isPrimitiveDataType = type => !(type === 'array' || type === 'key_value' || type === 'reference' || type === 'json')
 
 function FieldForm({ classes, entities, initialValues, ...other }) {
   const decorators = initialValues.id ? [] : [ decorator ]

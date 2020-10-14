@@ -36,6 +36,8 @@ class UpdateRecord
       attribute = { linked_record: process_reference(input_value) }
     elsif field.image? || field.file?
       attribute = { asset: process_asset(input_value) } if !URL.valid?(input_value)
+    elsif field.json?
+      attribute = { value: input_value.to_json }
     else
       attribute = { value: input_value }
     end

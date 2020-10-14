@@ -1,7 +1,9 @@
 import _ from 'lodash'
+import flat from 'flat'
 import gql from 'graphql-tag'
 import injectSheet from 'react-jss'
 import React, { Fragment, useState } from 'react'
+import { klona } from 'klona'
 import { withApollo } from 'react-apollo'
 
 import ActionList from 'components/ActionList'
@@ -18,6 +20,41 @@ import useModal from 'lib/hooks/useModal'
 import withConfirmation from 'components/internal/decorators/withConfirmation'
 import { CellContent } from 'components/internal/typography'
 import { MutationResponseModes, OptimisticResponseModes, withMutation, withQuery } from 'lib/data'
+
+const fieldsNormalizedByName = fields => fields
+  .reduce((acc, curr) => ({ ...acc, [curr.name]: curr }), {})
+
+const keyValuesArrayToJson = (keyValuesArray) => {
+  const flatObject = keyValuesArray
+    .filter(v => v)
+    .reduce((acc, curr) => ({ ...acc, [curr.key]: curr.value || null }), {})
+
+  return flat.unflatten(flatObject, { object: true })
+}
+
+const recursiveKeyValuesToJSON = (traits, fields) => {
+  const normalizedFields = fieldsNormalizedByName(fields)
+  const traitsCopy = klona(traits)
+
+  const helper = (object) => {
+    if (_.isObject(object)) {
+      Object.keys(object).forEach((key) => {
+        if (normalizedFields[key] && normalizedFields[key].dataType === 'json') {
+          object[key] = keyValuesArrayToJson(object[key])
+        } else if (normalizedFields[key] && normalizedFields[key].dataType === 'array' && normalizedFields[key].elementType === 'json') {
+          object[key] = object[key]
+            .filter(o => o.value)
+            .map(o => ({ ...o, value: keyValuesArrayToJson(o.value) }))
+        } else {
+          helper(object[key])
+        }
+      })
+    }
+  }
+  helper(traitsCopy)
+
+  return traitsCopy
+}
 
 function RecordsPage({
   confirm,
@@ -81,8 +118,10 @@ function RecordsPage({
   }
 
   const handleFormSubmit = (values) => {
+    const traits = recursiveKeyValuesToJSON(values.traits, fields)
+
     if (values.id) {
-      return updateRecord(values, {
+      return updateRecord({ ...values, traits }, {
         onSuccess: () => {
           setEntities([]) // Reset entities so that they are refetched when modal reopens
           closeModal()
@@ -90,7 +129,7 @@ function RecordsPage({
       })
     }
 
-    return createRecord(values, { onSuccess: () => closeModal() })
+    return createRecord({ ...values, traits }, { onSuccess: () => closeModal() })
   }
 
   const makePropertyRenderer = field => ({ record }) => {

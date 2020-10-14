@@ -12,7 +12,7 @@ class Field extends BaseModel {
   }
 
   static isColumn(field) {
-    return ![ 'key_value', 'array' ].some(dataType => dataType === field.dataType)
+    return ![ 'key_value', 'array', 'json' ].some(dataType => dataType === field.dataType)
   }
 
   static isRoot(field) {
@@ -40,7 +40,8 @@ Field.dataTypeList = [
   { value: 'key_value', label: 'Key-Value' },
   { value: 'array', label: 'Array' },
   { value: 'reference', label: 'Reference' },
-  { value: 'color', label: 'Color Picker' }
+  { value: 'color', label: 'Color Picker' },
+  { value: 'json', label: 'JSON' }
 ]
 
 Field.elementTypeList = Field.dataTypeList.filter(({ value }) => value !== 'array')
