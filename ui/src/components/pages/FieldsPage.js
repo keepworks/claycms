@@ -93,8 +93,8 @@ function FieldsPage({
   if (loading) {
     return <Loader record={{ loading: true }} />
   }
-
   const processedFields = _.sortBy(processFields(rootFields), [ 'position' ])
+
   const nextPosition = processedFields.length > 0 ? _.last(processedFields).position + 1 : 0
   const formValues = { entityId: match.params.entityId, dataType: 'single_line_text', position: nextPosition, ...field }
 

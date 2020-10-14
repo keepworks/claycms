@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "target": "es6",  
+    "baseUrl": "./src/",    
+    "paths": {
+      "client/*": [
+        "client/*"
+      ],
+      "components/*": [
+        "components/*"
+      ],
+      "constants/*": [
+        "constants/*"
+      ],
+      "fonts/*": [
+        "assets/fonts/*"
+      ],
+      "images/*": [
+        "assets/images/*"
+      ],
+      "lib/*": [
+        "lib/*"
+      ],
+      "models/*": [
+        "models/*"
+      ],
+      "mutations/*": [
+        "mutations/*"
+      ],
+      "queries/*": [
+        "queries/*"
+      ],
+      "styles/*": [
+        "styles/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ]
+}

@@ -8,6 +8,7 @@ import DashboardPage from 'components/pages/DashboardPage'
 import EntitiesPage from 'components/pages/EntitiesPage'
 import EntityPage from 'components/pages/EntityPage'
 import Loader from 'components/internal/Loader'
+import ResourcesPage from 'components/pages/ResourcesPage'
 import ProjectSettingsPage from 'components/pages/ProjectSettingsPage'
 import { withQuery } from 'lib/data'
 
@@ -34,6 +35,7 @@ function ProjectPage({ history, match, project, loading }) {
         <Route path={`${match.path}/entities/:entityId`} component={EntityPage} />
         <Route path={`${match.path}/entities`} component={EntitiesPage} />
         <Route path={`${match.path}/assets`} component={AssetsPage} />
+        <Route path={`${match.path}/resources`} component={ResourcesPage} />
         <Route path={`${match.path}/settings`} component={ProjectSettingsPage} />
         <Redirect from={match.url} to={`${match.url}/entities`} />
       </Switch>

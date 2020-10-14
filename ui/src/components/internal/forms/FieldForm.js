@@ -158,6 +158,7 @@ function FieldForm({ classes, entities, initialValues, ...other }) {
                 <Field
                   name={`${name}.label`}
                   component={TextInput}
+                  autoFocus
                   label="Label"
                 />
                 <Field

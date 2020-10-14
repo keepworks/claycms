@@ -1,18 +1,18 @@
-const dotenv                        = require('dotenv')
-const path                          = require('path')
-const webpack                       = require('webpack')
-const merge                         = require('webpack-merge')
-const BundleAnalyzerPlugin          = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
-const CompressionPlugin             = require('compression-webpack-plugin')
-const DotenvPlugin                  = require('webpack-dotenv-plugin')
-const FaviconsWebpackPlugin         = require('favicons-webpack-plugin')
-const HtmlWebpackPlugin             = require('html-webpack-plugin')
+const dotenv = require('dotenv')
+const path = require('path')
+const webpack = require('webpack')
+const merge = require('webpack-merge')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const CompressionPlugin = require('compression-webpack-plugin')
+const DotenvPlugin = require('webpack-dotenv-plugin')
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
-const MiniCssExtractPlugin          = require('mini-css-extract-plugin')
-const OptimizeCSSAssetsPlugin       = require('optimize-css-assets-webpack-plugin')
-const SentryWebpackPlugin           = require('@sentry/webpack-plugin')
-const TerserPlugin                  = require('terser-webpack-plugin')
-const WebpackNotifierPlugin         = require('webpack-notifier')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+const SentryWebpackPlugin = require('@sentry/webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
+const WebpackNotifierPlugin = require('webpack-notifier')
 
 const envFilename = (() => {
   if (process.env.HEROKU) {
@@ -112,7 +112,7 @@ config.development = {
     ]
   },
   output: {
-    filename: 'javascripts/[name].js',
+    filename: 'javascripts/[name].js'
   },
   devServer: {
     host: process.env.HOST,
@@ -136,13 +136,13 @@ config.development = {
         enforce: 'pre',
         loader: 'eslint-loader',
         options: {
-          emitWarning: true,
+          emitWarning: true
         }
       },
 
       {
         test: /\.(css)$/,
-        use: ['style-loader', 'css-loader']
+        use: [ 'style-loader', 'css-loader' ]
       }
     ]
   }
@@ -218,6 +218,6 @@ config.production = {
   }
 }
 
-config.staging = config.production;
+config.staging = config.production
 
-module.exports = merge(config.common, config[process.env.NODE_ENV]);
+module.exports = merge(config.common, config[process.env.NODE_ENV])

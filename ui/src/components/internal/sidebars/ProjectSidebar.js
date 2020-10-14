@@ -17,6 +17,7 @@ function ProjectSidebar({ match, project: { name } = {} }) {
 
       <SidebarItem item={{ name: 'Entities', url: `${match.url}/entities`, icon: 'flow' }} />
       <SidebarItem item={{ name: 'Assets', url: `${match.url}/assets`, icon: 'segment' }} />
+      <SidebarItem item={{ name: 'Resources', url: `${match.url}/resources`, icon: 'segment' }} />
       <Divider />
 
       <SidebarItem item={{ name: 'Settings', url: `${match.url}/settings`, icon: 'setting' }} />

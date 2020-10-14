@@ -23,6 +23,7 @@ function RecordsPage({
   confirm,
   createRecord,
   destroyRecord,
+  cloneRecord,
   fields,
   loading,
   match,
@@ -153,6 +154,13 @@ function RecordsPage({
               description: 'By clicking on Confirm, you will delete the record.',
               onConfirmClick: () => destroyRecord(clickedRecord)
             })
+          },
+          {
+            icon: 'copy',
+            onClick: clickedRecord => confirm({
+              description: 'By clicking on Confirm, you will duplicate the record.',
+              onConfirmClick: () => cloneRecord(clickedRecord)
+            })
           }
         ]}
       />
@@ -253,6 +261,10 @@ RecordsPage.fragments = {
         id
         fileOriginal
       }
+      field {
+        id
+        position
+      }
     }
   `
 }
@@ -305,6 +317,21 @@ RecordsPage = withMutation(gql`
       traits
     }
   `
+})(RecordsPage)
+
+RecordsPage = withMutation(gql`
+  mutation CloneRecordMutation($id: ID!) {
+    cloneRecord(id: $id) {
+      ...RecordsPage_records
+    }
+  }
+  
+  ${RecordsPage.fragments.records}
+`, {
+  mode: MutationResponseModes.APPEND,
+  successAlert: () => ({
+    message: 'Successfully duplicated record'
+  })
 })(RecordsPage)
 
 RecordsPage = withMutation(gql`

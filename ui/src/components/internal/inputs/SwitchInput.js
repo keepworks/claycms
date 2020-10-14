@@ -1,17 +1,23 @@
 import classNames from 'classnames'
 import injectSheet from 'react-jss'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, { useState } from 'react'
 
 import * as mixins from 'styles/mixins'
+import FieldHint from 'components/FieldHint'
 import withUniqueId from 'components/decorators/withUniqueId'
 
-function SwitchInput({ activeLabel, classes, disabled, input, label, uniqueId }) {
+function SwitchInput({ activeLabel, classes, disabled, hint, input, label, uniqueId }) {
+  const [ isHintActive, setIsHintActive ] = useState(false)
+
   const name = (input && input.name) || 'switch'
 
   const isActive = typeof input.value === 'boolean' ? input.value : input.value === 't'
 
   const toggleValue = () => input.onChange(!isActive)
+
+  const showHint = () => setIsHintActive(true)
+  const hideHint = () => setIsHintActive(false)
 
   const handleKeyDown = (e) => {
     if (e.key === ' ' || e.key === 'Enter') {
@@ -35,7 +41,11 @@ function SwitchInput({ activeLabel, classes, disabled, input, label, uniqueId })
   }
 
   return (
-    <div className={classes.switchInputWrapper}>
+    <div
+      className={classes.switchInputWrapper}
+      onMouseEnter={showHint}
+      onMouseLeave={hideHint}
+    >
       {renderLabel()}
       <div
         role="checkbox"
@@ -51,7 +61,10 @@ function SwitchInput({ activeLabel, classes, disabled, input, label, uniqueId })
       >
         {input.name && <input id={uniqueId(name)} type="hidden" disabled={disabled} {...input} />}
       </div>
+
+      <FieldHint active={isHintActive} hint={hint} />
     </div>
+
   )
 }
 
@@ -72,11 +85,15 @@ SwitchInput.defaultProps = {
 SwitchInput = withUniqueId()(SwitchInput)
 
 export default injectSheet(({ colors, shadows, typography, units }) => ({
+  base: {
+    display: 'relative'
+  },
   switchInputWrapper: {
     alignItems: 'center',
     display: 'flex',
     marginTop: 10,
-    marginBottom: ({ spaced }) => (spaced ? units.inputMargin_spaced : units.inputMargin)
+    marginBottom: ({ spaced }) => (spaced ? units.inputMargin_spaced : units.inputMargin),
+    position: 'relative'
   },
   label: ({ reverse }) => ({
     ...typography.regularSquished,

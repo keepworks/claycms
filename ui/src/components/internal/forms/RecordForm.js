@@ -113,17 +113,16 @@ const fieldRenderer = (props) => {
 
     return (
       <div key={key} className={classes.inputWrapper}>
-        <label htmlFor={name} className={classes.label}>
-          {fieldLabel}
-        </label>
         <Field
           isImage
           name={name}
+          label={fieldLabel}
           color="pale"
           component={UploadInput}
           type="file"
           variant="lightSquished"
           note={note}
+          hint={field.hint}
         />
       </div>
     )
@@ -132,16 +131,15 @@ const fieldRenderer = (props) => {
   if (field.dataType === 'file') {
     return (
       <div key={key} className={classes.inputWrapper}>
-        <label htmlFor={name} className={classes.label}>
-          {fieldLabel}
-        </label>
         <Field
           previewUrl
           name={name}
+          label={fieldLabel}
           color="pale"
           component={UploadInput}
           type="file"
           variant="lightSquished"
+          hint={field.hint}
         />
       </div>
     )
@@ -157,6 +155,7 @@ const fieldRenderer = (props) => {
           label={fieldLabel}
           spaced
           stretched={false}
+          hint={field.hint}
         />
       </div>
     )
@@ -170,6 +169,7 @@ const fieldRenderer = (props) => {
         component={ColorPickerInput}
         label={fieldLabel}
         spaced
+        hint={field.hint}
       />
     )
   }
@@ -328,6 +328,7 @@ const fieldRenderer = (props) => {
                   options={entitiesOptions}
                   label="Select Entity"
                   onSelectOption={option => mutators.newReference(name, option.entity)}
+                  hint={field.hint}
                 />
               )}
               {currentOption === 'edit' && (
@@ -338,6 +339,7 @@ const fieldRenderer = (props) => {
                   label={`Select from ${parentEntity.label}`}
                   onSelectOption={() => mutators.editReference(name, record, selectedEntity.fields)}
                   truncateText
+                  hint={field.hint}
                 />
               )}
               {((selectedRecord && currentOption === 'edit') || (selectedEntityId && currentOption === 'new')) && (
@@ -380,6 +382,7 @@ const fieldRenderer = (props) => {
         key={name}
         label={fieldLabel}
         name={name}
+        hint={field.hint}
         options={options}
       />
     )
@@ -394,6 +397,7 @@ const fieldRenderer = (props) => {
       spaced
       parse={v => v}
       stretched={false}
+      hint={field.hint}
       {...fieldOptions}
     />
   )
@@ -503,20 +507,12 @@ function RecordForm({ initialValues, entities, fields, ...other }) {
   )
 }
 
-export default injectSheet(({ colors, typography }) => ({
+export default injectSheet(({ typography }) => ({
   inputWrapper: {
     marginBottom: 50
   },
   input: {
     ...mixins.transitionSimple(),
     ...typography.regularSquished
-  },
-  label: {
-    ...mixins.transitionSimple(),
-    ...typography.regularSmallSpaced,
-
-    color: colors.text_pale,
-    display: 'block',
-    marginBottom: 15
   }
 }))(RecordForm)

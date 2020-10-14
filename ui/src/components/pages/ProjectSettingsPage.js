@@ -158,7 +158,6 @@ ProjectSettingsPage.fragments = {
     fragment ProjectSettingsPage_keyPair on KeyPair {
       id
       publicKey
-      privateKey
     }
   `,
   project: gql`
@@ -195,7 +194,6 @@ const ProjectSettingsPageQuery = gql`
   }
 
   ${ProjectSettingsPage.fragments.keyPair}
-  ${ProjectSettingsPage.fragments.export}
 `
 
 const ProjectExportsQuery = gql`

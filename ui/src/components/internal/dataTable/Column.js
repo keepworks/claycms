@@ -41,7 +41,7 @@ Column.defaultProps = {
   cellRenderer: defaultCellRenderer,
   cellWrapper: DefaultCellWrapper,
   flexGrow: 0,
-  width: 100
+  width: 125
 }
 
 export default Column

@@ -3,9 +3,12 @@ import React, { useState } from 'react'
 import { ChromePicker } from 'react-color'
 
 import ColorTile from 'components/internal/ColorTile'
+import FieldHint from 'components/FieldHint'
 
-function ColorPickerInput({ classes = {}, input, label }) {
+function ColorPickerInput({ classes = {}, hint, input, label }) {
   const [ showPicker, updateShowPicker ] = useState(false)
+  const [ isHintActive, setIsHintActive ] = useState(false)
+
   const name = (input && input.name) || 'color-picker'
 
   const onTileClick = () => {
@@ -16,8 +19,15 @@ function ColorPickerInput({ classes = {}, input, label }) {
     input.onChange(color.hex)
   }
 
+  const showHint = () => setIsHintActive(true)
+  const hideHint = () => setIsHintActive(false)
+
   return (
-    <div className={classes.base}>
+    <div
+      className={classes.base}
+      onMouseEnter={showHint}
+      onMouseLeave={hideHint}
+    >
       <label htmlFor={name} className={classes.label}>
         {label}
       </label>
@@ -39,6 +49,8 @@ function ColorPickerInput({ classes = {}, input, label }) {
           <ChromePicker color={input.value} onChangeComplete={onColorChange} />
         </div>
       )}
+
+      <FieldHint active={isHintActive} hint={hint} />
     </div>
   )
 }

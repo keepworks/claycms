@@ -28,24 +28,34 @@ function AssetBox({ actions, asset, classes }) {
       <ItemBar>
         <Tag>{Asset.getExtension(asset)}</Tag>
         <div className={classes.assetActions}>
-          {actions.map(({ icon, onClick }) => (
-            <div
-              key={icon}
-              role="button"
-              tabIndex={-1}
-              className={classes.assetAction}
-              onClick={(e) => {
-                e.stopPropagation()
-                onClick(asset, e)
-              }}
-              onKeyPress={(e) => {
-                e.stopPropagation()
-                onClick(asset, e)
-              }}
-            >
-              <FontIcon name={icon} size="small" />
-            </div>
-          ))}
+          {actions.map(({ icon, key, onClick, render }) => {
+            if (render) {
+              return (
+                <div key={key} className={classes.assetAction}>
+                  {render(asset)}
+                </div>
+              )
+            }
+
+            return (
+              <div
+                key={icon}
+                role="button"
+                tabIndex={-1}
+                className={classes.assetAction}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onClick(asset, e)
+                }}
+                onKeyPress={(e) => {
+                  e.stopPropagation()
+                  onClick(asset, e)
+                }}
+              >
+                <FontIcon name={icon} size="small" />
+              </div>
+            )
+          })}
         </div>
       </ItemBar>
 
@@ -60,10 +70,16 @@ function AssetBox({ actions, asset, classes }) {
 }
 
 AssetBox.propTypes = {
-  actions: PropTypes.arrayOf(PropTypes.shape({
-    icon: PropTypes.string.isRequired,
-    onClick: PropTypes.func
-  }))
+  actions: PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.shape({
+      icon: PropTypes.string.isRequired,
+      onClick: PropTypes.func
+    }),
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      render: PropTypes.func.isRequired
+    })
+  ]))
 }
 
 AssetBox.defaultProps = {

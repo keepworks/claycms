@@ -17,7 +17,7 @@ class Record extends BaseModel {
 
   summarize = (record, entity) => {
     const baseText = `${entity.label} - ID: ${record.id}`
-    const rootProperties = record.properties.filter(p => !p.parentId)
+    const rootProperties = _.sortBy(record.properties, [ 'field.position' ]).filter(p => !p.parentId)
 
     const values = rootProperties.map((property) => {
       const field = this.fieldsMapping[property.fieldId]

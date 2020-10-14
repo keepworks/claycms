@@ -4,12 +4,14 @@ import injectSheet from 'react-jss'
 import PropTypes from 'prop-types'
 import React, { createRef, Fragment, useEffect, useState } from 'react'
 
+import * as mixins from 'styles/mixins'
 import FieldError from 'components/FieldError'
 import FilledButton from 'components/buttons/FilledButton'
 import Hint from 'components/internal/typography/Hint'
 import Input from 'components/inputs/TextInput'
 import ItemBar from 'components/ItemBar'
 import Spacer from 'components/Spacer'
+import withUniqueId from 'components/decorators/withUniqueId'
 import { Text } from 'components/internal/typography'
 
 function fileUrl(value) {
@@ -24,7 +26,8 @@ function imageUrl(value) {
   return fileUrl(value) || URL.createObjectURL(value)
 }
 
-function UploadInput({ classes, input, meta, note, isImage, previewUrl }) {
+function UploadInput({ classes, input, label, meta, note, isImage, previewUrl }) {
+  const name = (input && input.name) || 'switch'
   const dropzoneRef = createRef()
   const [ droppedFiles, setDroppedFiles ] = useState([ input.value ])
 
@@ -56,52 +59,57 @@ function UploadInput({ classes, input, meta, note, isImage, previewUrl }) {
   const isFilePresent = droppedFiles[0].name || droppedFiles[0].trim()
 
   return (
-    <Dropzone
-      ref={dropzoneRef}
-      onDrop={update}
-      multiple={false}
-      noKeyboard
-      noClick
-    >
-      {({ getRootProps, getInputProps, acceptedFiles }) => (
-        <div {...getRootProps({ className: classes.dropzone })}>
-          <input {...getInputProps()} />
-          {isFilePresent && image && <div className={classes.previewSection} style={{ backgroundImage: `url(${image})` }} />}
-          {isFilePresent && previewUrl && fileUrl(input.value) && (
-            <div className={classes.previewSection}>
-              <Text>Uploaded File:</Text>
-              <Hint>{fileUrl(input.value)}</Hint>
+    <Fragment>
+      <label htmlFor={name} className={classes.label}>
+        {label}
+      </label>
+      <Dropzone
+        ref={dropzoneRef}
+        onDrop={update}
+        multiple={false}
+        noKeyboard
+        noClick
+      >
+        {({ getRootProps, getInputProps, acceptedFiles }) => (
+          <div {...getRootProps({ className: classes.dropzone })}>
+            <input {...getInputProps()} />
+            {isFilePresent && image && <div className={classes.previewSection} style={{ backgroundImage: `url(${image})` }} />}
+            {isFilePresent && previewUrl && fileUrl(input.value) && (
+              <div className={classes.previewSection}>
+                <Text>Uploaded File:</Text>
+                <Hint>{fileUrl(input.value)}</Hint>
+              </div>
+            )}
+            <div className={classes.browseSection}>
+              {isFilePresent && acceptedFiles.length > 0 && (
+                <Fragment>
+                  {droppedFiles.map(({ path, size }) => (
+                    <Text key={path}>
+                      {`${path} - ${size} bytes`}
+                    </Text>
+                  ))}
+                </Fragment>
+              )}
+              {(!isFilePresent || acceptedFiles.length === 0) && (
+                <Text>Drag &apos;n&apos; drop a file here</Text>
+              )}
+              <Spacer height={20} />
+              <ItemBar>
+                <FilledButton type="button" size="tiny" label="Browse" onClick={openDialog} />
+                {isFilePresent && <FilledButton type="button" size="tiny" label="Remove" onClick={() => remove(acceptedFiles[0])} />}
+              </ItemBar>
+              {note && (
+                <Fragment>
+                  <Spacer height={20} />
+                  {note}
+                </Fragment>
+              )}
             </div>
-          )}
-          <div className={classes.browseSection}>
-            {isFilePresent && acceptedFiles.length > 0 && (
-              <Fragment>
-                {droppedFiles.map(({ path, size }) => (
-                  <Text key={path}>
-                    {`${path} - ${size} bytes`}
-                  </Text>
-                ))}
-              </Fragment>
-            )}
-            {(!isFilePresent || acceptedFiles.length === 0) && (
-              <Text>Drag &apos;n&apos; drop a file here</Text>
-            )}
-            <Spacer height={20} />
-            <ItemBar>
-              <FilledButton type="button" size="tiny" label="Browse" onClick={openDialog} />
-              {isFilePresent && <FilledButton type="button" size="tiny" label="Remove" onClick={() => remove(acceptedFiles[0])} />}
-            </ItemBar>
-            {note && (
-              <Fragment>
-                <Spacer height={20} />
-                {note}
-              </Fragment>
-            )}
+            <FieldError active={meta.active} error={Input.fieldError(meta)} />
           </div>
-          <FieldError active={meta.active} error={Input.fieldError(meta)} />
-        </div>
-      )}
-    </Dropzone>
+        )}
+      </Dropzone>
+    </Fragment>
   )
 }
 
@@ -117,7 +125,9 @@ UploadInput.defaultProps = {
   note: null
 }
 
-export default injectSheet(({ colors, units }) => ({
+UploadInput = withUniqueId()(UploadInput)
+
+export default injectSheet(({ colors, typography, units }) => ({
   dropzone: {
     backgroundColor: colors.uploadInputBackground,
     borderColor: colors.uploadInputBorder,
@@ -135,6 +145,14 @@ export default injectSheet(({ colors, units }) => ({
     alignSelf: 'center',
     display: 'flex',
     flexDirection: 'column'
+  },
+  label: {
+    ...mixins.transitionSimple(),
+    ...typography.regularSmallSpaced,
+
+    color: colors.text_pale,
+    display: 'block',
+    marginBottom: 15
   },
   previewSection: {
     backgroundPosition: 'center',

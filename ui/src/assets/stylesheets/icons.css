@@ -42,9 +42,6 @@
 .icon-blimp:before {
   content: "\e00b";
 }
-.icon-camera:before {
-  content: "\e00c";
-}
 .icon-code:before {
   content: "\e00d";
 }
@@ -63,9 +60,6 @@
 .icon-invite-user:before {
   content: "\e012";
 }
-.icon-route:before {
-  content: "\e013";
-}
 .icon-hot-air-balloon:before {
   content: "\e014";
 }
@@ -77,9 +71,6 @@
 }
 .icon-event:before {
   content: "\e017";
-}
-.icon-edit:before {
-  content: "\e018";
 }
 .icon-delivery:before {
   content: "\e019";
@@ -185,9 +176,6 @@
 }
 .icon-tag:before {
   content: "\e03c";
-}
-.icon-checkbox:before {
-  content: "\e03d";
 }
 .icon-attachment:before {
   content: "\e03e";
@@ -393,6 +381,9 @@
 .icon-template-shift-layer:before {
   content: "\e07e";
 }
+.icon-checkbox:before {
+  content: "\e03d";
+}
 .icon-campaign:before {
   content: "\e07f";
 }
@@ -428,4 +419,43 @@
 }
 .icon-received:before {
   content: "\e08a";
+}
+.icon-processing:before {
+  content: "\e08b";
+}
+.icon-edit:before {
+  content: "\e018";
+}
+.icon-camera:before {
+  content: "\e00c";
+}
+.icon-add-rule:before {
+  content: "\e08c";
+}
+.icon-add-group:before {
+  content: "\e08d";
+}
+.icon-campaign-stopwatch:before {
+  content: "\e090";
+}
+.icon-api:before {
+  content: "\e091";
+}
+.icon-person-tick:before {
+  content: "\e092";
+}
+.icon-trigger:before {
+  content: "\e08e";
+}
+.icon-message:before {
+  content: "\e093";
+}
+.icon-integration:before {
+  content: "\e013";
+}
+.icon-wifi-1:before {
+  content: "\e08f";
+}
+.icon-copy:before {
+  content: "\e094";
 }
