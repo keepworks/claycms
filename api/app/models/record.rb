@@ -11,7 +11,9 @@ class Record < ApplicationRecord
 
   accepts_nested_attributes_for :properties
 
+  # To fix the hierarchy of the parent and respective cloned record
   after_destroy -> { Property.rebuild! }
+  after_update -> { Property.rebuild! }
 
   # To clone record and its properties
   amoeba do
