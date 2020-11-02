@@ -42,7 +42,7 @@ gem 'graphql-guard'
 gem 'apollo_upload_server', '2.0.0.beta.1'
 
 # Uploads
-gem 'shrine', '~> 3.2', '>= 3.2.1'
+gem 'shrine'
 gem 'image_processing'
 gem 'aws-sdk-s3', '~> 1'
 

@@ -411,7 +411,7 @@ DEPENDENCIES
   scout_apm
   sentry-raven
   shoulda-matchers!
-  shrine (~> 3.2, >= 3.2.1)
+  shrine
   simplecov
   sneakers
   spring
