@@ -49,6 +49,8 @@ function TextInput({
     </label>
   )
 
+  const propsToClean = [ 'activeIcon', 'isActive', 'initialValue', 'flexGrow' ]
+
   return (
     <div className={classes.textInput}>
       <div className={classes.inputWrapper} disabled={disabled}>
@@ -62,7 +64,7 @@ function TextInput({
             className={classes.input}
             rows={8}
             {...input}
-            {...cleanProps(other, [ 'activeIcon', 'isActive', 'initialValue' ])}
+            {...cleanProps(other, propsToClean)}
           />
         ) : (
           <input
@@ -70,7 +72,7 @@ function TextInput({
             type={type}
             className={classes.input}
             {...input}
-            {...cleanProps(other, [ 'activeIcon', 'isActive', 'initialValue' ])}
+            {...cleanProps(other, propsToClean)}
           />
         )}
       </div>
