@@ -32,6 +32,9 @@
       ],
       "styles/*": [
         "styles/*"
+      ],
+      "fragments/*": [
+        "fragments/*"
       ]
     }
   },

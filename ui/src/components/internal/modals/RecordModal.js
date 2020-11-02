@@ -5,7 +5,7 @@ import RecordForm from 'components/internal/forms/RecordForm'
 import Spacer from 'components/Spacer'
 import { DialogTitle } from 'components/internal/typography'
 
-function RecordModal({ formValues, onFormSubmit, ...other }) {
+function RecordModal({ formValues, ...other }) {
   const action = formValues.id ? 'Edit' : 'New'
 
   const title = `${action} Record`
@@ -17,7 +17,6 @@ function RecordModal({ formValues, onFormSubmit, ...other }) {
       <RecordForm
         {...other}
         initialValues={formValues}
-        onSubmit={onFormSubmit}
       />
     </Modal>
   )

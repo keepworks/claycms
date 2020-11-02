@@ -71,6 +71,7 @@ config.common = {
       components: path.join(__dirname, 'src', 'components'),
       constants: path.join(__dirname, 'src', 'constants'),
       fonts: path.join(__dirname, 'src', 'assets', 'fonts'),
+      fragments: path.join(__dirname, 'src', 'fragments'),
       images: path.join(__dirname, 'src', 'assets', 'images'),
       lib: path.join(__dirname, 'src', 'lib'),
       models: path.join(__dirname, 'src', 'models'),

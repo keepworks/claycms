@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { object, string } from 'yup'
 
 import BaseModel from './BaseModel'
@@ -21,6 +22,29 @@ class Field extends BaseModel {
 
   static isVisibleColumn(field) {
     return !(field.settings.visibility === false)
+  }
+
+  static process(fields = []) {
+    const rootFields = fields.filter(Field.isRoot)
+
+    const processFields = entityFields => entityFields.map((entityField) => {
+      const newField = _.omit(entityField, [ '__typename' ])
+      const childFields = fields.filter(f => f.parentId === entityField.id)
+
+      if (childFields.length && entityField.dataType === 'key_value') {
+        newField.children = processFields(childFields)
+      }
+
+      if (childFields.length && entityField.dataType === 'array') {
+        const subChildFields = fields.filter(f => f.parentId === childFields[0].id)
+
+        newField.children = processFields(subChildFields)
+      }
+
+      return newField
+    })
+
+    return processFields(rootFields)
   }
 }
 

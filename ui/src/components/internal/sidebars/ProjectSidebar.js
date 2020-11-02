@@ -20,6 +20,7 @@ function ProjectSidebar({ match, project: { name } = {} }) {
       <SidebarItem item={{ name: 'Resources', url: `${match.url}/resources`, icon: 'segment' }} />
       <Divider />
 
+      <SidebarItem item={{ name: 'Search', url: `${match.url}/search`, icon: 'search' }} />
       <SidebarItem item={{ name: 'Settings', url: `${match.url}/settings`, icon: 'setting' }} />
     </Fragment>
   )

@@ -2,12 +2,14 @@
 /* eslint-disable no-use-before-define */
 import _ from 'lodash'
 import arrayMutators from 'final-form-arrays'
+import gql from 'graphql-tag'
 import flat from 'flat'
 import injectSheet from 'react-jss'
 import React, { Fragment, useState, useRef, useEffect } from 'react'
 import { Field, Form } from 'react-final-form'
 import { FieldArray } from 'react-final-form-arrays'
 import { ReactSortable } from 'react-sortablejs'
+import { withApollo } from 'react-apollo'
 
 import * as mixins from 'styles/mixins'
 import ButtonGroupInput from 'components/internal/inputs/ButtonGroupInput'
@@ -28,6 +30,8 @@ import TextInput from 'components/inputs/TextInput'
 import UploadInput from 'components/inputs/UploadInput'
 import { LoaderText } from 'components/internal/typography'
 import { SidePaneFormFooter } from 'components/internal/sidePane'
+
+import RECORD_FRAGMENTS from 'fragments/record'
 
 const REFERENCE_OPTIONS = [
   { value: 'new', label: 'New Record' },
@@ -575,8 +579,53 @@ const toggleFormVisibilityMutator = ([ name, selectedRecord, fields ], state, { 
   })
 }
 
-function RecordForm({ initialValues, entities, fields, ...other }) {
+function RecordForm({ initialValues, fields, client, ...other }) {
   const newRecord = !initialValues.id
+
+  const [ entities, setEntities ] = useState([])
+  const [ entitiesLoading, setEntitiesLoading ] = useState(false)
+  const [ recordLoading, setRecordLoading ] = useState(false)
+
+  const getEntities = async (entityId) => {
+    setEntitiesLoading(true)
+    const { data } = await client.query({
+      query: RecordForm.ENTITIES_QUERY,
+      variables: {
+        entityId
+      },
+      fetchPolicy: 'network-only'
+    })
+
+    const newEntities = [ ...entities, ...data.referencedEntities ]
+
+    setEntities(newEntities)
+    setEntitiesLoading(false)
+    return newEntities
+  }
+
+  const getRecord = async (recordId) => {
+    setRecordLoading(true)
+    const { data: { record } } = await client.query({
+      query: RecordForm.RECORD_QUERY,
+      variables: {
+        recordId
+      },
+      fetchPolicy: 'network-only'
+    })
+
+    const newEntities = entities
+      .map((entity) => {
+        if (entity.id === record.entityId) {
+          entity.records.push(record)
+        }
+
+        return entity
+      })
+
+    setEntities(newEntities)
+    setRecordLoading(false)
+    return newEntities
+  }
 
   return (
     <Form
@@ -592,12 +641,16 @@ function RecordForm({ initialValues, entities, fields, ...other }) {
       render={({ handleSubmit, pristine, submitting, values, form: { mutators } }) => (
         <form onSubmit={handleSubmit}>
           {renderForm({
-            ...other,
+            getEntities,
+            getRecord,
+            entitiesLoading,
+            recordLoading,
             initialValues,
             fields,
             values,
             entities,
-            mutators
+            mutators,
+            ...other
           })}
           <SidePaneFormFooter>
             <FilledButton label="Submit" disabled={(newRecord && pristine) || submitting} />
@@ -609,7 +662,7 @@ function RecordForm({ initialValues, entities, fields, ...other }) {
   )
 }
 
-export default injectSheet(({ typography }) => ({
+RecordForm = injectSheet(({ typography }) => ({
   inputWrapper: {
     marginBottom: 50
   },
@@ -618,3 +671,42 @@ export default injectSheet(({ typography }) => ({
     ...typography.regularSquished
   }
 }))(RecordForm)
+
+RecordForm.ENTITIES_QUERY = gql`
+  query RecordsPageEntitiesQuery($entityId: ID!) {
+    referencedEntities(entityId: $entityId) {
+      id
+      label
+      name
+      label
+      parentId
+
+      fields {
+        ...Record_fields
+      }
+
+      records {
+        ...Record_records
+      }
+    }
+  }
+
+  ${RECORD_FRAGMENTS.records}
+  ${RECORD_FRAGMENTS.fields}
+`
+
+RecordForm.RECORD_QUERY = gql`
+  query RecordsPageRecordQuery($recordId: ID!) {
+    record(recordId: $recordId) {
+      entityId
+
+      ...Record_records
+    }
+  }
+
+  ${RECORD_FRAGMENTS.records}
+`
+
+RecordForm = withApollo(RecordForm)
+
+export default RecordForm

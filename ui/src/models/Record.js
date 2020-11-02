@@ -50,6 +50,8 @@ class Record extends BaseModel {
       id: record.id,
       createdAt: record.createdAt,
       updatedAt: record.updatedAt,
+      entityId: record.entityId,
+      entity: record.entity,
       traits
     }
   })

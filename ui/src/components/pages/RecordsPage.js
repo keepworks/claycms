@@ -1,13 +1,10 @@
 import _ from 'lodash'
 import gql from 'graphql-tag'
 import injectSheet from 'react-jss'
-import React, { Fragment, useState } from 'react'
+import React, { Fragment } from 'react'
 import { withApollo } from 'react-apollo'
 
 import ActionList from 'components/ActionList'
-import ColorTile from 'components/internal/ColorTile'
-import Field from 'models/Field'
-import FontIcon from 'components/FontIcon'
 import IconButton from 'components/internal/buttons/IconButton'
 import Loader from 'components/internal/Loader'
 import Record from 'models/Record'
@@ -17,7 +14,10 @@ import Table from 'components/internal/dataTable/Table'
 import useModal from 'lib/hooks/useModal'
 import withConfirmation from 'components/internal/decorators/withConfirmation'
 import { CellContent } from 'components/internal/typography'
+import getRecordColumnFields from 'lib/getRecordColumnFields'
+import recordPropertyRenderer from 'lib/recordPropertyRenderer'
 import { MutationResponseModes, OptimisticResponseModes, withMutation, withQuery } from 'lib/data'
+import RECORD_FRAGMENTS from 'fragments/record'
 
 function RecordsPage({
   confirm,
@@ -28,109 +28,25 @@ function RecordsPage({
   loading,
   match,
   records,
-  updateRecord,
-  client
+  history
 }) {
   const [
     selectedRecord, isModalOpen, openModal, closeModal
   ] = useModal()
 
-  const [ entities, setEntities ] = useState([])
-  const [ entitiesLoading, setEntitiesLoading ] = useState(false)
-  const [ recordLoading, setRecordLoading ] = useState(false)
-
-  const getEntities = async (entityId) => {
-    setEntitiesLoading(true)
-    const { data } = await client.query({
-      query: RecordsPage.ENTITIES_QUERY,
-      variables: {
-        entityId
-      },
-      fetchPolicy: 'network-only'
-    })
-
-    const newEntities = [ ...entities, ...data.referencedEntities ]
-
-    setEntities(newEntities)
-    setEntitiesLoading(false)
-    return newEntities
-  }
-
-  const getRecord = async (recordId) => {
-    setRecordLoading(true)
-    const { data: { record } } = await client.query({
-      query: RecordsPage.RECORD_QUERY,
-      variables: {
-        recordId
-      },
-      fetchPolicy: 'network-only'
-    })
-
-    const newEntities = entities
-      .map((entity) => {
-        if (entity.id === record.entityId) {
-          entity.records.push(record)
-        }
-
-        return entity
-      })
-
-    setEntities(newEntities)
-    setRecordLoading(false)
-    return newEntities
-  }
-
-  const handleFormSubmit = (values) => {
-    if (values.id) {
-      return updateRecord(values, {
-        onSuccess: () => {
-          setEntities([]) // Reset entities so that they are refetched when modal reopens
-          closeModal()
-        }
-      })
-    }
-
-    return createRecord(values, { onSuccess: () => closeModal() })
-  }
-
-  const makePropertyRenderer = field => ({ record }) => {
-    let isValid = false
-    const value = record.traits[field.name]
-
-    if (_.isString(value) || _.isNumber(value)) {
-      isValid = true
-    }
-
-    if (field.dataType === 'boolean') {
-      const isActive = typeof value === 'boolean' ? value : value === 't'
-
-      return (
-        <CellContent>
-          {isActive ? (
-            <FontIcon name="round-tick" size="small" />
-          ) : (
-            <FontIcon name="round-remove" size="small" />
-          )}
-        </CellContent>
-      )
-    }
-
-    if (field.dataType === 'color' && value) {
-      return <CellContent>{<ColorTile color={value} />}</CellContent>
-    }
-
-    return <CellContent>{isValid ? value : '-'}</CellContent>
+  const handleSubmit = (values) => {
+    createRecord(values, { onSuccess: () => { closeModal() } })
   }
 
   const idRenderer = ({ record }) => <CellContent>{record.id}</CellContent>
 
-  const columnFields = _.sortBy((fields || []).filter(Field.isRoot).filter(Field.isColumn).filter(Field.isVisibleColumn), [ 'position' ])
+  const columnFields = getRecordColumnFields(fields)
 
   const columns = columnFields.map(field => ({
     dataKey: `traits.${field.name}`,
     label: field.label,
     flexGrow: 1,
-    cellRenderer: makePropertyRenderer(field)
+    cellRenderer: recordPropertyRenderer(field)
   }))
 
   columns.unshift({
@@ -147,7 +63,13 @@ function RecordsPage({
       <ActionList
         record={record}
         actions={[
-          { icon: 'edit', onClick: clickedRecord => openModal(clickedRecord) },
+          {
+            icon: 'edit',
+            onClick: (clickedRecord) => {
+              const path = `${match.url}/${clickedRecord.id}/edit`
+              history.push(path)
+            }
+          },
           {
             icon: 'trash',
             onClick: clickedRecord => confirm({
@@ -205,14 +127,10 @@ function RecordsPage({
       <RecordModal
         isOpen={isModalOpen}
         fields={fields || []}
-        entities={entities}
-        getEntities={getEntities}
-        entitiesLoading={entitiesLoading}
-        recordLoading={recordLoading}
         formValues={{ entityId: match.params.entityId, ...selectedRecord }}
-        onFormSubmit={handleFormSubmit}
         onRequestClose={closeModal}
-        getRecord={getRecord}
+        closeModal={closeModal}
+        onSubmit={handleSubmit}
       />
     </Fragment>
   )
@@ -229,69 +147,14 @@ RecordsPage = injectSheet(({ colors, typography }) => ({
   }
 }))(RecordsPage)
 
-RecordsPage.fragments = {
-  fields: gql`
-    fragment RecordsPage_fields on Field {
-      id
-      dataType
-      validations
-      settings
-      elementType
-      referencedEntityId
-      defaultValue
-      elementType
-      entityId
-      hint
-      label
-      name
-      parentId
-      position
-      referencedEntityId
-    }
-  `,
-  properties: gql`
-    fragment RecordsPage_properties on Property {
-      id
-      value
-      position
-      fieldId
-      linkedRecordId
-      parentId
-      asset {
-        id
-        fileOriginal
-      }
-      field {
-        id
-        position
-      }
-    }
-  `
-}
-
-RecordsPage.fragments.records = gql`
-  fragment RecordsPage_records on Record {
-    id
-    entityId
-    createdAt
-    updatedAt
-
-    properties {
-      ...RecordsPage_properties
-    }
-  }
-
-  ${RecordsPage.fragments.properties}
-`
-
 RecordsPage = withMutation(gql`
   mutation CreateRecordMutation($input: CreateRecordInput!) {
     createRecord(input: $input) {
-      ...RecordsPage_records
+      ...Record_records
     }
   }
 
-  ${RecordsPage.fragments.records}
+  ${RECORD_FRAGMENTS.records}
 `, {
   inputFilter: gql`
     fragment CreateRecordInput on CreateRecordInput {
@@ -300,38 +163,6 @@ RecordsPage = withMutation(gql`
     }
   `,
   mode: MutationResponseModes.APPEND
-})(RecordsPage)
-
-RecordsPage = withMutation(gql`
-  mutation UpdateRecordMutation($id: ID!, $input: UpdateRecordInput!) {
-    updateRecord(id: $id, input: $input) {
-      ...RecordsPage_records
-    }
-  }
-
-  ${RecordsPage.fragments.records}
-`, {
-  inputFilter: gql`
-    fragment UpdateRecordInput on UpdateRecordInput {
-      id
-      traits
-    }
-  `
-})(RecordsPage)
-
-RecordsPage = withMutation(gql`
-  mutation CloneRecordMutation($id: ID!) {
-    cloneRecord(id: $id) {
-      ...RecordsPage_records
-    }
-  }
-  
-  ${RecordsPage.fragments.records}
-`, {
-  mode: MutationResponseModes.APPEND,
-  successAlert: () => ({
-    message: 'Successfully duplicated record'
-  })
 })(RecordsPage)
 
 RecordsPage = withMutation(gql`
@@ -348,10 +179,25 @@ RecordsPage = withMutation(gql`
   })
 })(RecordsPage)
 
+RecordsPage = withMutation(gql`
+  mutation CloneRecordMutation($id: ID!) {
+    cloneRecord(id: $id) {
+      ...Record_records
+    }
+  }
+  
+  ${RECORD_FRAGMENTS.records}
+`, {
+  mode: MutationResponseModes.APPEND,
+  successAlert: () => ({
+    message: 'Successfully duplicated record'
+  })
+})(RecordsPage)
+
 RecordsPage = withQuery(gql`
   query RecordsPageQuery($entityId: ID!) {
     records(entityId: $entityId) {
-      ...RecordsPage_records
+      ...Record_records
     }
 
     entity(id: $entityId) {
@@ -361,12 +207,12 @@ RecordsPage = withQuery(gql`
     }
 
     fields(entityId: $entityId) {
-      ...RecordsPage_fields
+      ...Record_fields
     }
   }
 
-  ${RecordsPage.fragments.records}
-  ${RecordsPage.fragments.fields}
+  ${RECORD_FRAGMENTS.records}
+  ${RECORD_FRAGMENTS.fields}
 `, {
   options: ({ match }) => ({
     variables: {
@@ -375,40 +221,6 @@ RecordsPage = withQuery(gql`
   })
 })(RecordsPage)
 
-RecordsPage.ENTITIES_QUERY = gql`
-  query RecordsPageEntitiesQuery($entityId: ID!) {
-    referencedEntities(entityId: $entityId) {
-      id
-      label
-      name
-      label
-      parentId
-
-      fields {
-        ...RecordsPage_fields
-      }
-
-      records {
-        ...RecordsPage_records
-      }
-    }
-  }
-
-  ${RecordsPage.fragments.records}
-  ${RecordsPage.fragments.fields}
-`
-
-RecordsPage.RECORD_QUERY = gql`
-  query RecordsPageRecordQuery($recordId: ID!) {
-    record(recordId: $recordId) {
-      entityId
-
-      ...RecordsPage_records
-    }
-  }
-
-  ${RecordsPage.fragments.records}
-`
 RecordsPage = withApollo(RecordsPage)
 
 export default withConfirmation()(RecordsPage)

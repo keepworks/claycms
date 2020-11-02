@@ -15,45 +15,22 @@ import { Field } from 'models'
 import { MutationResponseModes, OptimisticResponseModes, withMutation, withQuery } from 'lib/data'
 import { CellLabel, CellText, CellTitle } from 'components/internal/typography'
 
+import FIELD_FRAGMENTS from 'fragments/fields'
+
 function FieldsPage({
   confirm,
   createField,
   destroyField,
-  entities,
-  fields,
+  entities = [],
+  fields = [],
   loading,
   match,
   sortFields,
-  updateField
+  history
 }) {
   const [ field, isFieldSidePaneOpen, openFieldSidePane, closeFieldSidePane ] = useSidePane()
 
-  const rootFields = (fields || []).filter(Field.isRoot)
-
-  const handleFormSubmit = (values) => {
-    if (values.id) {
-      return updateField(values, { onSuccess: () => closeFieldSidePane() })
-    }
-
-    return createField(values, { onSuccess: () => closeFieldSidePane() })
-  }
-
-  const processFields = (entityFields = []) => entityFields.map((entityField) => {
-    const newField = _.omit(entityField, [ '__typename' ])
-    const childFields = fields.filter(f => f.parentId === entityField.id)
-
-    if (childFields.length && entityField.dataType === 'key_value') {
-      newField.children = processFields(childFields)
-    }
-
-    if (childFields.length && entityField.dataType === 'array') {
-      const subChildFields = fields.filter(f => f.parentId === childFields[0].id)
-
-      newField.children = processFields(subChildFields)
-    }
-
-    return newField
-  })
+  const handleFormSubmit = values => createField(values, { onSuccess: () => closeFieldSidePane() })
 
   const labelRenderer = ({ record: { label } }) => (
     <Fragment>
@@ -80,7 +57,11 @@ function FieldsPage({
   ]
 
   const actions = [
-    { icon: 'edit', onClick: record => openFieldSidePane(record) },
+    { icon: 'edit',
+      onClick: (clickedField) => {
+        const path = `${match.url}/${clickedField.id}/edit`
+        history.push(path)
+      } },
     {
       icon: 'trash',
       onClick: record => confirm({
@@ -93,8 +74,8 @@ function FieldsPage({
   if (loading) {
     return <Loader record={{ loading: true }} />
   }
-  const processedFields = _.sortBy(processFields(rootFields), [ 'position' ])
 
+  const processedFields = _.sortBy(Field.process(fields), [ 'position' ])
   const nextPosition = processedFields.length > 0 ? _.last(processedFields).position + 1 : 0
   const formValues = { entityId: match.params.entityId, dataType: 'single_line_text', position: nextPosition, ...field }
 
@@ -146,26 +127,6 @@ FieldsPage = injectSheet(({ colors, typography }) => ({
   }
 }))(FieldsPage)
 
-FieldsPage.fragments = {
-  fields: gql`
-    fragment FieldsPage_fields on Field {
-      id
-      dataType
-      validations
-      settings
-      defaultValue
-      elementType
-      entityId
-      hint
-      label
-      name
-      parentId
-      position
-      referencedEntityId
-    }
-  `
-}
-
 FieldsPage = withMutation(gql`
   mutation SortFieldsMutation($input: SortFieldsInput!) {
     sortFields(input: $input) {
@@ -179,11 +140,11 @@ FieldsPage = withMutation(gql`
 FieldsPage = withMutation(gql`
   mutation CreateFieldMutation($input: CreateFieldInput!) {
     createField(input: $input) {
-      ...FieldsPage_fields
+      ...Field_fields
     }
   }
 
-  ${FieldsPage.fragments.fields}
+  ${FIELD_FRAGMENTS.fields}
 `, {
   inputFilter: gql`
     fragment CreateFieldInput on CreateFieldInput {
@@ -205,38 +166,6 @@ FieldsPage = withMutation(gql`
 })(FieldsPage)
 
 FieldsPage = withMutation(gql`
-  mutation UpdateFieldMutation($id: ID!, $input: UpdateFieldInput!) {
-    updateField(id: $id, input: $input) {
-      ...FieldsPage_fields
-    }
-  }
-
-  ${FieldsPage.fragments.fields}
-`, {
-  inputFilter: gql`
-    fragment UpdateFieldInput on UpdateFieldInput {
-      id
-      children
-      dataType
-      validations
-      settings
-      defaultValue
-      elementType
-      hint
-      label
-      name
-      position
-      referencedEntityId
-    }
-  `,
-  mode: MutationResponseModes.CUSTOM,
-  updateData: ({ cachedData, responseRecords }) => {
-    const currentRecords = cachedData.fields
-    cachedData.fields = _.unionWith(currentRecords, responseRecords, _.isEqual)
-  }
-})(FieldsPage)
-
-FieldsPage = withMutation(gql`
   mutation DestroyFieldMutation($id: ID!) {
     destroyField(id: $id) {
       id
@@ -253,7 +182,7 @@ FieldsPage = withMutation(gql`
 FieldsPage = withQuery(gql`
   query FieldsPageQuery($entityId: ID!, $projectId: ID!) {
     fields(entityId: $entityId) {
-      ...FieldsPage_fields
+      ...Field_fields
     }
 
     entity(id: $entityId) {
@@ -269,7 +198,7 @@ FieldsPage = withQuery(gql`
     }
   }
 
-  ${FieldsPage.fragments.fields}
+  ${FIELD_FRAGMENTS.fields}
 `, {
   options: ({ match }) => ({
     variables: {
