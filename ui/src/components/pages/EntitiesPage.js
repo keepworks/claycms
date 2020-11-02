@@ -17,7 +17,15 @@ import { MutationResponseModes, OptimisticResponseModes, withMutation, withQuery
 import { CellLabel, CellText, CellTitle, PageTitle } from 'components/internal/typography'
 
 function EntitiesPage({
-  confirm, createEntity, updateEntity, destroyEntity, history, loading, entities, match
+  confirm,
+  createEntity,
+  updateEntity,
+  destroyEntity,
+  history,
+  loading,
+  entities = [],
+  match,
+  sortEntities
 }) {
   const [ entity, isEntitySidePaneOpen, openEntitySidePane, closeEntitySidePane ] = useSidePane()
   const { params: { teamId, projectId } } = match
@@ -95,8 +103,10 @@ function EntitiesPage({
     }
   ]
 
-  const rootEntities = _.sortBy((entities || []).filter(e => !e.parentId), [ 'label' ])
-  const childEntities = _.sortBy((entities || []).filter(e => !!e.parentId), [ 'parentId', 'label' ])
+  const rootEntities = entities.filter(e => !e.parentId)
+  const sortedEntities = _.sortBy(entities, [ 'position', 'label' ])
+  const nextPosition = sortedEntities.length > 0 ? (_.last(sortedEntities).position || 0) + 1 : 0
+  const formValues = { projectId: match.params.projectId, position: nextPosition, ...entity }
 
   return (
     <Fragment>
@@ -128,14 +138,18 @@ function EntitiesPage({
         actions={actions}
         columns={columns}
         loading={loading}
-        records={_.concat(rootEntities, childEntities)}
+        records={sortedEntities}
         selectable={false}
+        sortable
+        onSortingChange={data => sortEntities({
+          entities: data.map((datum, index) => ({ id: datum.id, position: index }))
+        })}
       />
 
       <EntitySidePane
         isOpen={isEntitySidePaneOpen}
         entities={rootEntities}
-        formValues={{ projectId: match.params.projectId, ...entity }}
+        formValues={formValues}
         onFormSubmit={handleFormSubmit}
         onRequestClose={closeEntitySidePane}
       />
@@ -162,6 +176,7 @@ EntitiesPage.fragments = {
       name
       label
       singleton
+      position
     }
   `
 }
@@ -182,6 +197,7 @@ EntitiesPage = withMutation(gql`
       name
       label
       singleton
+      position
     }
   `,
   mode: MutationResponseModes.APPEND
@@ -220,6 +236,16 @@ EntitiesPage = withMutation(gql`
     message: `Successfully deleted entity: ${name}`
   })
 })(EntitiesPage)
+
+EntitiesPage = withMutation(gql`
+  mutation SortEntitiesMutation($input: SortEntitiesInput!) {
+    sortEntities(input: $input) {
+      ...EntitiesPage_entities
+    }
+  }
+
+  ${EntitiesPage.fragments.entities}
+`)(EntitiesPage)
 
 EntitiesPage = withQuery(gql`
   query EntitiesPageQuery($projectId: ID!) {

@@ -19,6 +19,7 @@ class SortEntitiesMutator < ApplicationMutator
   def mutate
     entity_id_position_mapping = permitted_params[:entities].inject({}) do |mapping, entity_params|
       mapping[entity_params[:id]] = entity_params[:position]
+      mapping
     end
 
     entity_ids = entity_id_position_mapping.keys
@@ -27,7 +28,7 @@ class SortEntitiesMutator < ApplicationMutator
     entities = entities.map do |entity|
       authorize! entity, :update?
 
-      entity.position = entity_id_position_mapping[entity.id]
+      entity.position = entity_id_position_mapping[entity.id.to_s]
       entity
     end
 
