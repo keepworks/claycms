@@ -2,15 +2,23 @@ url_options = {
   host: ENV['ASSET_HOST']
 }
 
-if Rails.env.production? || Rails.env.staging?
+if ENV['AWS_ACCESS_KEY_ID'].present?
   require 'shrine/storage/s3'
 
   s3_options = {
-    access_key_id: Credentials.get(:aws_access_key_id),
-    secret_access_key: Credentials.get(:aws_secret_access_key),
-    region: Credentials.get(:s3_region),
-    bucket: Credentials.get(:s3_bucket)
+    access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+    secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+    region: ENV['S3_REGION'],
+    bucket: ENV['S3_BUCKET']
   }
+
+  endpoint = ENV['S3_ENDPOINT']
+  if endpoint.present?
+    s3_options.merge!(
+      endpoint: endpoint,
+      force_path_style: true
+    )
+  end
 
   Shrine.storages = {
     cache: Shrine::Storage::S3.new(prefix: 'cache', **s3_options),

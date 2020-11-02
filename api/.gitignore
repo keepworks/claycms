@@ -134,3 +134,5 @@ $RECYCLE.BIN/
 *.log
 *.sql
 *.sqlite
+
+docker-compose.yml

@@ -55,6 +55,9 @@ gem 'geocoder'
 gem 'mail'
 gem 'device_detector'
 
+# Monitoring
+gem 'elastic-apm'
+
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.1.0', require: false
 
