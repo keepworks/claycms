@@ -2,9 +2,9 @@
 /* eslint-disable no-use-before-define */
 import _ from 'lodash'
 import arrayMutators from 'final-form-arrays'
-import FieldGroup from 'components/internal/FieldGroup'
+import flat from 'flat'
 import injectSheet from 'react-jss'
-import React, { Fragment, useState } from 'react'
+import React, { Fragment, useState, useRef, useEffect } from 'react'
 import { Field, Form } from 'react-final-form'
 import { FieldArray } from 'react-final-form-arrays'
 import { ReactSortable } from 'react-sortablejs'
@@ -14,6 +14,7 @@ import ButtonGroupInput from 'components/internal/inputs/ButtonGroupInput'
 import CloseButton from 'components/buttons/CloseButton'
 import ColorPickerInput from 'components/internal/inputs/ColorPickerInput'
 import DragButton from 'components/buttons/DragButton'
+import FieldGroup from 'components/internal/FieldGroup'
 import FieldModel from 'models/Field'
 import FilledButton from 'components/buttons/FilledButton'
 import Hint from 'components/internal/typography/Hint'
@@ -33,43 +34,95 @@ const REFERENCE_OPTIONS = [
   { value: 'edit', label: 'Existing Record' }
 ]
 
-const JSONField = ({ name, label }) => (
-  <FieldArray name={name} key={name}>
-    {({ fields }) => (
+const objToKeyValueArray = (obj = {}) => {
+  if (Object.keys(obj).length === 0) return [ {} ]
+
+  const flatObject = flat.flatten(obj)
+
+  return Object.keys(flatObject).map(key => ({ key, value: flatObject[key] }))
+}
+
+const keyValuesArrayToObj = (keyValuesArray = []) => {
+  const flatValues = keyValuesArray
+    .filter(v => v && v.key)
+    .reduce((acc, curr) => ({ ...acc, [curr.key]: curr.value }), {})
+
+  return flat.unflatten(flatValues, { object: true })
+}
+
+const JSONField = ({ input, label }) => {
+  const [ values, setValues ] = useState(() => objToKeyValueArray(input.value))
+  const { name: inputName, onChange } = input
+
+  const debouncedOnChange = useRef(
+    _.debounce((keyValuesArray) => {
+      onChange(keyValuesArrayToObj(keyValuesArray))
+    },
+    200)
+  )
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setValues((currentValues) => {
+      const copy = [ ...currentValues ]
+      _.set(copy, name, value)
+      return copy
+    })
+  }
+
+  const push = () => {
+    setValues(currentValues => ([ ...currentValues, {} ]))
+  }
+
+  const remove = index => () => {
+    setValues(currentValues => currentValues.filter((__, i) => i !== index))
+  }
+
+  useEffect(() => {
+    debouncedOnChange.current(values)
+  }, [ values ])
+
+  return (
+    <Fragment key={inputName}>
       <Fragment>
         <Text variant="regularSquished" color="pale">{label}</Text>
         <Spacer height={10} />
         <FieldGroup>
-          {fields.map((field, index) => (
-            <ItemBar justifyContent="space-between" gutter="large" key={field}>
-              <Field
-                name={`${field}.key`}
-                component={TextInput}
+          {values.map((val, index) => (
+            /* eslint-disable react/no-array-index-key */
+            <ItemBar justifyContent="space-between" gutter="large" key={index}>
+              <TextInput
                 flexGrow={1}
-                parse={v => v}
                 placeholder="key"
                 spaced={false}
                 stretched={false}
+                input={{
+                  name: `${index}.key`,
+                  onChange: handleChange,
+                  value: val.key || ''
+                }}
               />
-              <Field
-                name={`${field}.value`}
-                component={TextInput}
+              <TextInput
                 flexGrow={1}
-                parse={v => v}
                 placeholder="value"
                 spaced={false}
                 stretched={false}
+                input={{
+                  name: `${index}.value`,
+                  onChange: handleChange,
+                  value: val.value || ''
+                }}
               />
-              <CloseButton onClick={() => fields.remove(index)} />
+              <CloseButton onClick={remove(index)} />
             </ItemBar>
-          ))
-          }
-          <FilledButton label="Add data" onClick={() => fields.push()} size="tiny" type="button" />
+          ))}
+
+          <FilledButton label="Add data" onClick={push} size="tiny" type="button" />
         </FieldGroup>
       </Fragment>
-    )}
-  </FieldArray>
-)
+    </Fragment>
+  )
+}
 
 const KeyValueField = ({ childFields, fieldLabel, initialValues, name, parentField, values, ...props }) => {
   const isParentArray = parentField && parentField.dataType === 'array'
@@ -282,9 +335,7 @@ const fieldRenderer = (props) => {
                   size="tiny"
                   label="Add"
                   onClick={() => fieldsArray.push({
-                    position: list.length,
-                    // needed so 1st field is visible automatically in JSONInput
-                    value: field.elementType === 'json' ? [ undefined ] : undefined
+                    position: list.length
                   })}
                 />
                 <Spacer height={20} />
@@ -297,7 +348,7 @@ const fieldRenderer = (props) => {
   }
 
   if (field.dataType === 'json') {
-    return <JSONField label={fieldLabel} name={name} />
+    return <Field component={JSONField} label={fieldLabel} name={name} />
   }
 
   if (field.dataType === 'reference') {
